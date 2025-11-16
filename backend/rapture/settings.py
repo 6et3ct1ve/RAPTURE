@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'accounts.User'
 
 # Application definition
 
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     "accounts",
     "games",
     "notifications",
-    "rewiews",
+    "reviews",
     "search",
     "stats",
 ]
