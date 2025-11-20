@@ -1,0 +1,46 @@
+.review-card {
+  margin-bottom: 20px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-header h3 {
+  color: var(--accent);
+  margin: 0;
+}
+
+.review-header .rating {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.review-card h4 {
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.review-text {
+  color: var(--text-primary);
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.review-ratings {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.likes {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 10px;
+}

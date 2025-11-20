@@ -1,0 +1,32 @@
+.review-form h2 {
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.ratings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.rating-input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rating-input label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.rating-input input {
+  width: 100%;
+}
+
+.review-form textarea {
+  width: 100%;
+  margin-bottom: 15px;
+  resize: vertical;
+}
