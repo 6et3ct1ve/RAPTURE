@@ -1,0 +1,21 @@
+.game-card {
+  cursor: pointer;
+  transition: border-color 0.2s;
+  display: block;
+}
+
+.game-card:hover {
+  border-color: var(--accent);
+}
+
+.game-card h3 {
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.game-card .developer,
+.game-card .release-date {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
