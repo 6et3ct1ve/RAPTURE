@@ -1,0 +1,30 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--accent);
+}
+
+.profile-header h1 {
+  color: var(--accent);
+  margin-bottom: 15px;
+}
+
+.profile-header p {
+  color: var(--text-secondary);
+  margin: 5px 0;
+}
+
+.profile-reviews {
+  margin-top: 40px;
+}
+
+.profile-reviews h2 {
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
