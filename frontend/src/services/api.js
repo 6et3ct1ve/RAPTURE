@@ -21,18 +21,23 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       const refresh = localStorage.getItem('refresh_token');
-      if (refresh) {
+      
+      if (refresh && !error.config._retry) {
+        error.config._retry = true;
         try {
-          const { data } = await axios.post(`${API_BASE_URL}/accounts/refresh/`, {
-            refresh,
-          });
+          const { data } = await axios.post(`${API_BASE_URL}/accounts/refresh/`, { refresh });
           localStorage.setItem('access_token', data.access);
           error.config.headers.Authorization = `Bearer ${data.access}`;
           return api.request(error.config);
         } catch {
           localStorage.clear();
-          window.location.href = '/login';
+          const currentPath = window.location.pathname;
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
         }
+      } else {
+        localStorage.clear();
+        const currentPath = window.location.pathname;
+        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
       }
     }
     return Promise.reject(error);
