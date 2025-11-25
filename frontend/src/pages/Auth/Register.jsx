@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import './Auth.css';
 
@@ -9,12 +9,19 @@ function Register() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await api.post('/accounts/register/', { username, email, password });
-      navigate('/login');
+      
+      const { data } = await api.post('/accounts/login/', { username, password });
+      localStorage.setItem('access_token', data.access);
+      localStorage.setItem('refresh_token', data.refresh);
+      
+      const redirect = searchParams.get('redirect') || '/';
+      navigate(redirect);
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed');
     }
@@ -49,7 +56,7 @@ function Register() {
           {error && <p className="error">{error}</p>}
           <button type="submit" className="btn-primary">REGISTER</button>
         </form>
-        <p>Have account? <Link to="/login">Login here</Link></p>
+        <p>Have account? <Link to={`/login${window.location.search}`}>Login here</Link></p>
       </div>
     </div>
   );
