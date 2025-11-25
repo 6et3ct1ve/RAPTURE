@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import GameCard from '../../components/game/GameCard';
 import ReviewCard from '../../components/review/ReviewCard';
+import SearchBar from '../../components/SearchBar/SearchBar';
 import './Home.css';
 
 function Home() {
@@ -26,6 +27,8 @@ function Home() {
 
   return (
     <div>
+      <SearchBar />
+
       <section className="games-section">
         <h2>// GAMES</h2>
         <div className="games-grid">
