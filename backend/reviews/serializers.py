@@ -6,24 +6,33 @@ class ReviewListSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     game_title = serializers.CharField(source="game.title", read_only=True)
     likes_count = serializers.SerializerMethodField()
+    short_text = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
         fields = [
             "id",
+            "user",
             "username",
+            "game",
             "game_title",
             "gameplay",
             "graphics",
             "story",
             "sound",
             "replayability",
+            "short_text",
             "likes_count",
             "created_at",
         ]
 
     def get_likes_count(self, obj):
         return obj.likes.count()
+
+    def get_short_text(self, obj):
+        if len(obj.text) > 100:
+            return obj.text[:100] + "..."
+        return obj.text
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
@@ -70,7 +79,6 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 
 class ReviewUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Review
         fields = ["gameplay", "graphics", "story", "sound", "replayability", "text"]
