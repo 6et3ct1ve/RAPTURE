@@ -3,10 +3,20 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User
 
 
-@admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ["username", "email", "role", "unique_id", "created_at"]
-    list_filter = ["role", "is_staff", "is_active"]
+    model = User
+    list_display = ["username", "email", "role", "unique_id", "is_staff"]
+    list_filter = ["role", "is_staff", "is_superuser"]
+
     fieldsets = UserAdmin.fieldsets + (
-        ("Custom Fields", {"fields": ("unique_id", "role")}),
+        ("Custom Fields", {"fields": ("role", "unique_id")}),
     )
+
+    readonly_fields = ["unique_id"]
+
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ("Custom Fields", {"fields": ("role",)}),
+    )
+
+
+admin.site.register(User, CustomUserAdmin)

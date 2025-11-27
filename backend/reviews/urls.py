@@ -10,4 +10,15 @@ urlpatterns = [
         views.CommentListCreateView.as_view(),
         name="review-comments",
     ),
+    path("user/<int:user_id>/", views.UserReviewsView.as_view(), name="user-reviews"),
+    path(
+        "admin/<int:pk>/",
+        views.AdminReviewDeleteView.as_view(),
+        name="admin-review-delete",
+    ),
+    path(
+        "comments/admin/<int:pk>/",
+        views.AdminCommentDeleteView.as_view(),
+        name="admin-comment-delete",
+    ),
 ]
