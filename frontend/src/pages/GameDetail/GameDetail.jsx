@@ -1,24 +1,43 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import ReviewCard from '../../components/review/ReviewCard';
 import ReviewForm from '../../components/review/ReviewForm';
 import './GameDetail.css';
 
 function GameDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [game, setGame] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [gameRes, reviewsRes] = await Promise.all([
-          api.get(`/games/${id}/`),
-          api.get(`/reviews/?game=${id}`)
-        ]);
+        const gameRes = await api.get(`/games/${id}/`);
         setGame(gameRes.data);
-        setReviews(reviewsRes.data.results || reviewsRes.data);
+        
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          setIsLoggedIn(true);
+          try {
+            const reviewsRes = await api.get(`/reviews/`);
+            const allReviews = reviewsRes.data.results || reviewsRes.data;
+            
+            const profileRes = await api.get('/accounts/profile/');
+            const myReviews = allReviews.filter(r => r.user === profileRes.data.id);
+            
+            const hasReviewForThisGame = myReviews.some(review => {
+              return String(review.game) === String(id) || review.game === parseInt(id);
+            });
+            
+            setHasReviewed(hasReviewForThisGame);
+            console.log('Has reviewed:', hasReviewForThisGame);
+          } catch (err) {
+            console.error('Review check error:', err);
+          }
+        }
       } catch (err) {
         console.error(err);
       }
@@ -26,25 +45,40 @@ function GameDetail() {
     fetchData();
   }, [id]);
 
-  const handleSubmitReview = async (reviewData) => {
-    try {
-      await api.post('/reviews/', {
-        game: id,
-        ...reviewData
-      });
-      const res = await api.get(`/reviews/?game=${id}`);
-      setReviews(res.data.results || res.data);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to submit review. Make sure you are logged in.');
-    }
-  };
+const handleWriteReviewClick = () => {
+  if (!isLoggedIn) {
+    const currentPath = window.location.pathname;
+    navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    return;
+  }
+  
+  if (hasReviewed) {
+    alert('You have already reviewed this game.');
+    return;
+  }
+  
+  setShowForm(true);
+};
+
+const handleSubmitReview = async (reviewData) => {
+  try {
+    await api.post('/reviews/', {
+      game: id,
+      ...reviewData
+    });
+    alert('Review submitted successfully!');
+    navigate('/reviews');
+  } catch (err) {
+    console.error(err);
+    alert('Failed to submit review.');
+  }
+};
 
   if (!game) return <div>Loading...</div>;
 
   return (
     <div>
-      <Link to="/" className="back-link">← Back to games</Link>
+      <Link to="/games" className="back-link">← Back to games</Link>
       
       <div className="game-header card">
         <h1>{game.title}</h1>
@@ -55,14 +89,49 @@ function GameDetail() {
         <p className="game-description">{game.description}</p>
       </div>
 
-      <ReviewForm gameId={id} onSubmit={handleSubmitReview} />
+      {game.reviews_count > 0 && (
+        <div className="game-stats card">
+          <h2>// STATISTICS</h2>
+          <div className="stats-grid">
+            <div className="stat-item">
+              <span className="stat-label">Reviews</span>
+              <span className="stat-value">{game.reviews_count}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Average Rating</span>
+              <span className="stat-value">★ {game.average_rating}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Gameplay</span>
+              <span className="stat-value">★ {game.avg_gameplay}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Graphics</span>
+              <span className="stat-value">★ {game.avg_graphics}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Story</span>
+              <span className="stat-value">★ {game.avg_story}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Sound</span>
+              <span className="stat-value">★ {game.avg_sound}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Replayability</span>
+              <span className="stat-value">★ {game.avg_replayability}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <div className="reviews-section">
-        <h2>// REVIEWS ({reviews.length})</h2>
-        {reviews.map(review => (
-          <ReviewCard key={review.id} review={review} />
-        ))}
-      </div>
+      {!showForm ? (
+        <button onClick={handleWriteReviewClick} className="btn-primary">
+          WRITE REVIEW
+        </button>
+      ) : (
+        <ReviewForm gameId={id} onSubmit={handleSubmitReview} />
+      )}
     </div>
   );
 }
