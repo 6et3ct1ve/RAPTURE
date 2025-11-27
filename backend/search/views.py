@@ -21,7 +21,6 @@ class GameSearchView(APIView):
             Q(title__icontains=query)
             | Q(developer__icontains=query)
             | Q(publisher__icontains=query)
-            | Q(description__icontains=query)
         )[:20]
 
         serializer = GameListSerializer(games, many=True)
@@ -38,9 +37,7 @@ class ReviewSearchView(APIView):
             return Response({"results": []})
 
         reviews = Review.objects.select_related("user", "game").filter(
-            Q(text__icontains=query)
-            | Q(game__title__icontains=query)
-            | Q(user__username__icontains=query)
+            user__username__icontains=query
         )[:20]
 
         serializer = ReviewListSerializer(reviews, many=True)
