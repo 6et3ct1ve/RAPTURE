@@ -7,6 +7,11 @@ urlpatterns = [
         "<int:pk>/read/", views.NotificationReadView.as_view(), name="notification-read"
     ),
     path(
+        "mark-all-read/",
+        views.NotificationMarkAllReadView.as_view(),
+        name="notification-mark-all-read",
+    ),
+    path(
         "<int:pk>/", views.NotificationDeleteView.as_view(), name="notification-delete"
     ),
 ]
