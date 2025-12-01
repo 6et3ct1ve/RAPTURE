@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import Modal from '../../components/Modal/Modal';
+import { useToast } from '../../components/Toast/ToastContext';
+import Spinner from '../../components/Spinner/Spinner';
 import './ReviewDetail.css';
 
 function ReviewDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [review, setReview] = useState(null);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
@@ -18,6 +22,12 @@ function ReviewDetail() {
     sound: 0,
     replayability: 0,
     text: ''
+  });
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: null
   });
 
   useEffect(() => {
@@ -58,7 +68,7 @@ function ReviewDetail() {
       setReview(data);
     } catch (err) {
       console.error(err);
-      alert('Please log in to like reviews');
+      showToast('Please log in to like reviews', 'error');
     }
   };
 
@@ -70,37 +80,51 @@ function ReviewDetail() {
       const { data } = await api.get(`/reviews/${id}/comments/`);
       const commentsData = data.results || data;
       setComments(Array.isArray(commentsData) ? commentsData : []);
+      showToast('Comment posted successfully', 'success');
     } catch (err) {
       console.error(err);
-      alert('Please log in to comment');
+      showToast('Please log in to comment', 'error');
     }
   };
 
-  const handleDeleteReview = async () => {
-    if (!window.confirm('Delete this review?')) return;
-    
-    try {
-      await api.delete(`/reviews/admin/${id}/`);
-      alert('Review deleted');
-      navigate('/reviews');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete review');
-    }
+  const handleDeleteReview = () => {
+    setModalConfig({
+      isOpen: true,
+      title: '// DELETE REVIEW',
+      message: 'Are you sure you want to delete this review? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/reviews/admin/${id}/`);
+          showToast('Review deleted successfully', 'success');
+          navigate('/reviews');
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to delete review', 'error');
+        }
+        setModalConfig({ ...modalConfig, isOpen: false });
+      }
+    });
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Delete this comment?')) return;
-    
-    try {
-      await api.delete(`/reviews/comments/admin/${commentId}/`);
-      const { data } = await api.get(`/reviews/${id}/comments/`);
-      const commentsData = data.results || data;
-      setComments(Array.isArray(commentsData) ? commentsData : []);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete comment');
-    }
+  const handleDeleteComment = (commentId) => {
+    setModalConfig({
+      isOpen: true,
+      title: '// DELETE COMMENT',
+      message: 'Are you sure you want to delete this comment?',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/reviews/comments/admin/${commentId}/`);
+          const { data } = await api.get(`/reviews/${id}/comments/`);
+          const commentsData = data.results || data;
+          setComments(Array.isArray(commentsData) ? commentsData : []);
+          showToast('Comment deleted successfully', 'success');
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to delete comment', 'error');
+        }
+        setModalConfig({ ...modalConfig, isOpen: false });
+      }
+    });
   };
 
   const handleEditToggle = () => {
@@ -114,27 +138,33 @@ function ReviewDetail() {
       const { data } = await api.get(`/reviews/${id}/`);
       setReview(data);
       setIsEditing(false);
-      alert('Review updated successfully');
+      showToast('Review updated successfully', 'success');
     } catch (err) {
       console.error(err);
-      alert('Failed to update review');
+      showToast('Failed to update review', 'error');
     }
   };
 
-  const handleDeleteOwn = async () => {
-    if (!window.confirm('Delete this review?')) return;
-    
-    try {
-      await api.delete(`/reviews/${id}/`);
-      alert('Review deleted');
-      navigate('/reviews');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete review');
-    }
+  const handleDeleteOwn = () => {
+    setModalConfig({
+      isOpen: true,
+      title: '// DELETE REVIEW',
+      message: 'Are you sure you want to delete this review? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/reviews/${id}/`);
+          showToast('Review deleted successfully', 'success');
+          navigate('/reviews');
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to delete review', 'error');
+        }
+        setModalConfig({ ...modalConfig, isOpen: false });
+      }
+    });
   };
 
-  if (!review) return <div>Loading...</div>;
+  if (!review) return <Spinner />;
 
   const avgRating = (
     (review.gameplay + review.graphics + review.story + 
@@ -325,6 +355,14 @@ function ReviewDetail() {
           )}
         </div>
       </div>
+
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        message={modalConfig.message}
+      />
     </div>
   );
 }
