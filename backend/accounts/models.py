@@ -12,6 +12,7 @@ class User(AbstractUser):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     role = models.CharField(max_length=10, choices=ROLES, default="user")
     created_at = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField(unique=True)
 
     def __str__(self):
         return self.username
