@@ -1,0 +1,30 @@
+.notfound-container {
+  min-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.notfound-content {
+  max-width: 500px;
+  padding: 40px;
+}
+
+.notfound-content h1 {
+  color: var(--accent);
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.notfound-message {
+  color: var(--accent);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.notfound-description {
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+  line-height: 1.6;
+}

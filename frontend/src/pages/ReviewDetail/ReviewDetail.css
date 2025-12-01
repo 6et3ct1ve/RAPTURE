@@ -31,9 +31,32 @@
   font-size: 0.85rem;
 }
 
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 .rating-big {
   font-size: 2rem;
   color: var(--accent);
+}
+
+.btn-delete-review {
+  background: var(--danger);
+  border: 1px solid var(--danger);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  transition: background 0.2s;
+}
+
+.btn-delete-review:hover {
+  background: #a0522d;
+  border-color: #a0522d;
 }
 
 .review-ratings-detail {
@@ -70,6 +93,63 @@
   }
 }
 
+.edit-review-form {
+  margin: 20px 0;
+}
+
+.rating-inputs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.rating-input-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.rating-input-item label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.rating-input-item input {
+  padding: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  text-align: center;
+}
+
+.rating-input-item input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.edit-review-form textarea {
+  width: 100%;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+  margin-bottom: 15px;
+}
+
+.edit-review-form textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .review-text {
   margin-bottom: 20px;
   line-height: 1.8;
@@ -87,6 +167,33 @@
 
 .review-actions button {
   padding: 8px 16px;
+}
+
+.btn-edit {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+}
+
+.btn-edit:hover {
+  border-color: var(--accent);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
 }
 
 .btn-danger {
