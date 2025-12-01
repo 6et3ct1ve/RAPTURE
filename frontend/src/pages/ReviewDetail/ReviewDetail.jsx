@@ -10,6 +10,15 @@ function ReviewDetail() {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    gameplay: 0,
+    graphics: 0,
+    story: 0,
+    sound: 0,
+    replayability: 0,
+    text: ''
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +28,14 @@ function ReviewDetail() {
           api.get(`/reviews/${id}/comments/`)
         ]);
         setReview(reviewRes.data);
+        setEditData({
+          gameplay: reviewRes.data.gameplay,
+          graphics: reviewRes.data.graphics,
+          story: reviewRes.data.story,
+          sound: reviewRes.data.sound,
+          replayability: reviewRes.data.replayability,
+          text: reviewRes.data.text
+        });
         const commentsData = commentsRes.data.results || commentsRes.data;
         setComments(Array.isArray(commentsData) ? commentsData : []);
         
@@ -86,12 +103,46 @@ function ReviewDetail() {
     }
   };
 
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.patch(`/reviews/${id}/`, editData);
+      const { data } = await api.get(`/reviews/${id}/`);
+      setReview(data);
+      setIsEditing(false);
+      alert('Review updated successfully');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update review');
+    }
+  };
+
+  const handleDeleteOwn = async () => {
+    if (!window.confirm('Delete this review?')) return;
+    
+    try {
+      await api.delete(`/reviews/${id}/`);
+      alert('Review deleted');
+      navigate('/reviews');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete review');
+    }
+  };
+
   if (!review) return <div>Loading...</div>;
 
   const avgRating = (
     (review.gameplay + review.graphics + review.story + 
      review.sound + review.replayability) / 5
   ).toFixed(1);
+
+  const isOwner = currentUser && currentUser.id === review.user;
+  const isAdmin = currentUser?.role === 'admin';
 
   return (
     <div>
@@ -104,48 +155,139 @@ function ReviewDetail() {
             <p>Review by {review.username}</p>
             <p className="review-date">{new Date(review.created_at).toLocaleDateString()}</p>
           </div>
-          <div className="review-rating">
-            <span className="rating-big">★ {avgRating}</span>
+          <div className="header-right">
+            <div className="review-rating">
+              <span className="rating-big">★ {avgRating}</span>
+            </div>
+            {isAdmin && (
+              <button onClick={handleDeleteReview} className="btn-delete-review">
+                DELETE
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="review-ratings-detail">
-          <div className="rating-item">
-            <span>Gameplay</span>
-            <span>★ {review.gameplay}</span>
-          </div>
-          <div className="rating-item">
-            <span>Graphics</span>
-            <span>★ {review.graphics}</span>
-          </div>
-          <div className="rating-item">
-            <span>Story</span>
-            <span>★ {review.story}</span>
-          </div>
-          <div className="rating-item">
-            <span>Sound</span>
-            <span>★ {review.sound}</span>
-          </div>
-          <div className="rating-item">
-            <span>Replayability</span>
-            <span>★ {review.replayability}</span>
-          </div>
-        </div>
+        {isEditing ? (
+          <form onSubmit={handleEditSubmit} className="edit-review-form">
+            <div className="rating-inputs">
+              <div className="rating-input-item">
+                <label>Gameplay (1-5)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={editData.gameplay}
+                  onChange={(e) => setEditData({...editData, gameplay: parseInt(e.target.value)})}
+                  required
+                />
+              </div>
+              <div className="rating-input-item">
+                <label>Graphics (1-5)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={editData.graphics}
+                  onChange={(e) => setEditData({...editData, graphics: parseInt(e.target.value)})}
+                  required
+                />
+              </div>
+              <div className="rating-input-item">
+                <label>Story (1-5)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={editData.story}
+                  onChange={(e) => setEditData({...editData, story: parseInt(e.target.value)})}
+                  required
+                />
+              </div>
+              <div className="rating-input-item">
+                <label>Sound (1-5)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={editData.sound}
+                  onChange={(e) => setEditData({...editData, sound: parseInt(e.target.value)})}
+                  required
+                />
+              </div>
+              <div className="rating-input-item">
+                <label>Replayability (1-5)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={editData.replayability}
+                  onChange={(e) => setEditData({...editData, replayability: parseInt(e.target.value)})}
+                  required
+                />
+              </div>
+            </div>
 
-        <div className="review-text">
-          <p>{review.text}</p>
-        </div>
+            <textarea
+              value={editData.text}
+              onChange={(e) => setEditData({...editData, text: e.target.value})}
+              rows="10"
+              placeholder="Your review..."
+              required
+            />
 
-        <div className="review-actions">
-          <button onClick={handleLike}>
-            ♥ {review.likes_count || 0}
-          </button>
-          {currentUser?.role === 'admin' && (
-            <button onClick={handleDeleteReview} className="btn-danger">
-              DELETE REVIEW
-            </button>
-          )}
-        </div>
+            <div className="edit-actions">
+              <button type="submit" className="btn-primary">SAVE CHANGES</button>
+              <button type="button" onClick={handleEditToggle} className="btn-secondary">
+                CANCEL
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <div className="review-ratings-detail">
+              <div className="rating-item">
+                <span>Gameplay</span>
+                <span>★ {review.gameplay}</span>
+              </div>
+              <div className="rating-item">
+                <span>Graphics</span>
+                <span>★ {review.graphics}</span>
+              </div>
+              <div className="rating-item">
+                <span>Story</span>
+                <span>★ {review.story}</span>
+              </div>
+              <div className="rating-item">
+                <span>Sound</span>
+                <span>★ {review.sound}</span>
+              </div>
+              <div className="rating-item">
+                <span>Replayability</span>
+                <span>★ {review.replayability}</span>
+              </div>
+            </div>
+
+            <div className="review-text">
+              <p>{review.text}</p>
+            </div>
+
+            <div className="review-actions">
+              <button onClick={handleLike}>
+                ♥ {review.likes_count || 0}
+              </button>
+              {isOwner && (
+                <>
+                  <button onClick={handleEditToggle} className="btn-edit">
+                    EDIT
+                  </button>
+                  <button onClick={handleDeleteOwn} className="btn-danger">
+                    DELETE
+                  </button>
+                </>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="comments-section card">
@@ -170,7 +312,7 @@ function ReviewDetail() {
                 <p className="comment-text">{comment.text}</p>
                 <div className="comment-footer">
                   <p className="comment-date">{new Date(comment.created_at).toLocaleDateString()}</p>
-                  {currentUser?.role === 'admin' && (
+                  {isAdmin && (
                     <button onClick={() => handleDeleteComment(comment.id)} className="btn-delete-small">
                       Delete
                     </button>
