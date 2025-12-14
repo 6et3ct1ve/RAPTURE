@@ -42,6 +42,16 @@ function Header() {
     }
   };
 
+  const handleRemoveNotification = async (id, e) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`/notifications/${id}/remove/`);
+      fetchNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
 const handleMarkAllRead = async (e) => {
   e.stopPropagation();
   try {
@@ -87,12 +97,23 @@ const handleMarkAllRead = async (e) => {
                           <div 
                             key={notif.id} 
                             className={`notification-item ${!notif.is_read ? 'unread' : ''}`}
-                            onClick={() => handleMarkAsRead(notif.id)}
                           >
-                            <p className="notification-message">{notif.message}</p>
-                            <span className="notification-time">
-                              {new Date(notif.created_at).toLocaleDateString()}
-                            </span>
+                            <div 
+                              className="notification-content"
+                              onClick={() => handleMarkAsRead(notif.id)}
+                            >
+                              <p className="notification-message">{notif.message}</p>
+                              <span className="notification-time">
+                                {new Date(notif.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <button 
+                              className="remove-btn"
+                              onClick={(e) => handleRemoveNotification(notif.id, e)}
+                              title="Remove notification"
+                            >
+                              🗑️
+                            </button>
                           </div>
                         ))
                       ) : (
