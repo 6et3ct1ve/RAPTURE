@@ -10,4 +10,6 @@ urlpatterns = [
     path('profile/<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
     path('password/', views.PasswordChangeView.as_view(), name='password-change'),
     path('admin/<int:pk>/', views.AdminUserDeleteView.as_view(), name='admin-user-delete'),
+    path('discord/callback/', views.DiscordLinkingView.as_view(), name='discord-linking'),
+    path('discord/user/', views.CheckDiscordView.as_view(), name='discord-linking'),
 ]

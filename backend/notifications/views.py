@@ -52,5 +52,9 @@ class NotificationMarkAllReadView(APIView):
 class NotificationDeleteView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+    def delete(self, request, pk):
+        try:
+            Notification.objects.filter(pk=pk, user=request.user).delete()
+            return Response({"status": "removedd notification"}, status=200)
+        except:
+            return Response(status=404)

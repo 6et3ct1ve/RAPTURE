@@ -1,7 +1,11 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Discord_User
 from reviews.models import Like
 
+class DiscordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Discord_User
+        fields = ['id', 'username', 'global_name']
 
 class UserListSerializer(serializers.ModelSerializer):
     reviews_count = serializers.SerializerMethodField()
@@ -20,6 +24,7 @@ class UserListSerializer(serializers.ModelSerializer):
             "reviews_count",
             "average_rating_given",
             "total_likes_received",
+            "discord_id",
         ]
 
     def get_reviews_count(self, obj):

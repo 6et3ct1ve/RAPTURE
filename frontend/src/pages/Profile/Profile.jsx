@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 import ReviewCard from '../../components/review/ReviewCard';
@@ -6,12 +6,15 @@ import { useToast } from '../../components/Toast/ToastContext';
 import Spinner from '../../components/Spinner/Spinner';
 import './Profile.css';
 
+const DISCORD_OAUTH2_URL = "https://discord.com/oauth2/authorize?client_id=1449565322137829477&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fprofile%2F&scope=identify";
+
 function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [discordUser, setDiscordUser] = useState(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -19,10 +22,14 @@ function Profile() {
     new_password: '',
     confirm_password: ''
   });
+  const callbackHandled = useRef(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        
         if (id) {
           const [userRes, reviewsRes] = await Promise.all([
             api.get(`/accounts/profile/${id}/`),
@@ -37,6 +44,18 @@ function Profile() {
           setUser(userRes.data);
           setReviews(reviewsRes.data.results || reviewsRes.data);
           setIsOwnProfile(true);
+          
+          if (code && !callbackHandled.current) {
+            callbackHandled.current = true; // Mark as handled immediately
+            
+            console.log('Discord code detected and being handled:', code);
+            window.history.replaceState({}, '', '/profile');
+            
+            await handleDiscordCallback(code);
+          }
+          if (!code) { 
+            await fetchDiscordUser();
+          }
         }
       } catch (err) {
         console.error(err);
@@ -47,6 +66,16 @@ function Profile() {
     };
     fetchProfile();
   }, [id, navigate]);
+
+  const fetchDiscordUser = async () => {
+    try {
+      const response = await api.get('/accounts/discord/user/');
+      setDiscordUser(response.data);
+    } catch (err) {
+      console.log('Discord not linked:', err);
+      setDiscordUser(null);
+    }
+  };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -72,7 +101,30 @@ function Profile() {
     }
   };
 
-  if (!user) return <Spinner />;
+  const handleDiscordLink = () => {
+    window.location.href = DISCORD_OAUTH2_URL;
+  };
+
+  const handleDiscordCallback = async (code) => {
+    console.log('Handling Discord callback with code:', code);
+    
+    window.history.replaceState({}, '', '/profile'); 
+
+    try {
+      const response = await api.post('/accounts/discord/callback/', { code });
+      console.log('Backend response:', response.data);
+      
+      await fetchDiscordUser();
+      
+      alert('Discord account linked successfully!');
+    } catch (err) {
+      console.error('Discord callback error:', err);
+      console.error('Error details:', err.response?.data);
+      alert(err.response?.data?.error || 'Failed to link Discord account. Please try again.');
+    }
+  };  
+
+  if (!user) return <div>Loading...</div>;
 
   return (
     <div>
@@ -85,12 +137,31 @@ function Profile() {
         <p>Member since: {new Date(user.created_at).toLocaleDateString()}</p>
         
         {isOwnProfile && (
-          <button 
-            onClick={() => setShowPasswordForm(!showPasswordForm)} 
-            className="btn-secondary"
-          >
-            {showPasswordForm ? 'CANCEL' : 'CHANGE PASSWORD'}
-          </button>
+          <>
+            <button 
+              onClick={() => setShowPasswordForm(!showPasswordForm)} 
+              className="btn-secondary"
+            >
+              {showPasswordForm ? 'CANCEL' : 'CHANGE PASSWORD'}
+            </button>
+            
+            {discordUser ? (
+              <div className="discord-linked">
+                <p>✓ Discord Linked</p>
+                <p>Username: {discordUser.username}</p>
+                {discordUser.global_username && (
+                  <p>Global Name: {discordUser.global_username}</p>
+                )}
+              </div>
+            ) : (
+              <button 
+                onClick={handleDiscordLink} 
+                className="btn-primary"
+              >
+                LINK TO DISCORD
+              </button>
+            )}
+          </>
         )}
       </div>
 
