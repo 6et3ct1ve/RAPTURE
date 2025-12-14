@@ -24,8 +24,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
+      if (error.config.url.includes('/accounts/login/') || error.config.url.includes('/accounts/register/')) {
+        return Promise.reject(error);
+      }
+
       const refresh = localStorage.getItem('refresh_token');
-      
       if (refresh && !error.config._retry) {
         error.config._retry = true;
         try {

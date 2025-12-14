@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 import ReviewCard from '../../components/review/ReviewCard';
+import { useToast } from '../../components/Toast/ToastContext';
+import Spinner from '../../components/Spinner/Spinner';
 import './Profile.css';
 
 const DISCORD_OAUTH2_URL = "https://discord.com/oauth2/authorize?client_id=1449565322137829477&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fprofile%2F&scope=identify";
@@ -9,6 +11,7 @@ const DISCORD_OAUTH2_URL = "https://discord.com/oauth2/authorize?client_id=14495
 function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [discordUser, setDiscordUser] = useState(null);
@@ -78,23 +81,23 @@ function Profile() {
     e.preventDefault();
     
     if (passwordData.new_password !== passwordData.confirm_password) {
-      alert('New passwords do not match');
+      showToast('New passwords do not match', 'error');
       return;
     }
     
     if (passwordData.new_password.length < 8) {
-      alert('Password must be at least 8 characters');
+      showToast('Password must be at least 8 characters', 'error');
       return;
     }
     
     try {
       await api.post('/accounts/password/', passwordData);
-      alert('Password changed successfully');
+      showToast('Password changed successfully', 'success');
       setShowPasswordForm(false);
       setPasswordData({ old_password: '', new_password: '', confirm_password: '' });
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || 'Failed to change password');
+      showToast(err.response?.data?.error || 'Failed to change password', 'error');
     }
   };
 

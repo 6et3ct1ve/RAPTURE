@@ -191,7 +191,7 @@ LOGGING = {
             'propagate': False,
         },
         'accounts': {
-            'handlers': ['auth_file'],
+            'handlers': ['auth_file', 'console'],
             'level': 'INFO',
             'propagate': False,
         },

@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import ReviewForm from '../../components/review/ReviewForm';
+import { useToast } from '../../components/Toast/ToastContext';
+import Spinner from '../../components/Spinner/Spinner';
 import './GameDetail.css';
 
 function GameDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [game, setGame] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(false);
@@ -45,36 +48,52 @@ function GameDetail() {
     fetchData();
   }, [id]);
 
-const handleWriteReviewClick = () => {
-  if (!isLoggedIn) {
-    const currentPath = window.location.pathname;
-    navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
-    return;
-  }
-  
-  if (hasReviewed) {
-    alert('You have already reviewed this game.');
-    return;
-  }
-  
-  setShowForm(true);
-};
+  const handleWriteReviewClick = () => {
+    if (!isLoggedIn) {
+      const currentPath = window.location.pathname;
+      navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+    
+    if (hasReviewed) {
+      showToast('You have already reviewed this game', 'error');
+      return;
+    }
+    
+    setShowForm(true);
+  };
 
-const handleSubmitReview = async (reviewData) => {
-  try {
-    await api.post('/reviews/', {
-      game: id,
-      ...reviewData
-    });
-    alert('Review submitted successfully!');
-    navigate('/reviews');
-  } catch (err) {
-    console.error(err);
-    alert('Failed to submit review.');
-  }
-};
+  const handleSubmitReview = async (reviewData) => {
+    const ratings = [reviewData.gameplay, reviewData.graphics, reviewData.story, reviewData.sound, reviewData.replayability];
+    
+    if (ratings.some(r => r < 1 || r > 5)) {
+      showToast('All ratings must be between 1 and 5', 'error');
+      return;
+    }
 
-  if (!game) return <div>Loading...</div>;
+    if (!reviewData.text || reviewData.text.trim().length < 10) {
+      showToast('Review text must be at least 10 characters', 'error');
+      return;
+    }
+
+    try {
+      await api.post('/reviews/', {
+        game: id,
+        ...reviewData
+      });
+      showToast('Review submitted successfully', 'success');
+      navigate('/reviews');
+    } catch (err) {
+      console.error(err);
+      if (err.response?.data?.error) {
+        showToast(err.response.data.error, 'error');
+      } else {
+        showToast('Failed to submit review', 'error');
+      }
+    }
+  };
+
+  if (!game) return <Spinner />;
 
   return (
     <div>
