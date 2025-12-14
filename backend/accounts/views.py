@@ -17,8 +17,6 @@ from .serializers import (
 from .permissions import IsAdmin
 from . import secrets
 
-            # serializers are magic. Apparently using foreign key here will automatically
-            # redirect me to discord_users model
 logger = logging.getLogger("accounts")
 
 class CheckDiscordView(APIView):
@@ -43,7 +41,7 @@ class DiscordLinkingView(APIView):
             "grant_type": "authorization_code",
             "code" : code,
             "redirect_uri" : secrets.CALLBACK_URL,
-        }) #headers = {"Content-Type" : "application/x-www-form-urlencoded"}
+        }) 
         token_req.raise_for_status()
         token_data = token_req.json()
         if not token_data["access_token"] or not token_data["token_type"]:
@@ -59,15 +57,12 @@ class DiscordLinkingView(APIView):
         
         user = request.user
         user.discord_id = discord_user_data_ser
-        # if user.is_valid():
         try:
             user.save() 
             request.user.refresh_from_db() 
             return Response(status=200)
         except:
             return Response({'error': "couldn't link user"}, status=400)
-        # else:
-        #     return Response(user.error, status=400)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
