@@ -16,6 +16,10 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+export const getDiscordUser = async () => {
+  return await api.get('/accounts/discord/user/');
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {

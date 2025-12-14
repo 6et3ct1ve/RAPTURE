@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     "notifications",
     "reviews.apps.ReviewsConfig",
     "search",
-    "stats",
 ]
 
 MIDDLEWARE = [

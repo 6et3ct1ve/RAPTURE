@@ -1,20 +1,73 @@
 import logging
+import requests
+import json
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.hashers import check_password
-from .models import User
+from .models import User, Discord_User
 from .serializers import (
     UserListSerializer,
     UserRegisterSerializer,
     UserUpdateSerializer,
     PasswordChangeSerializer,
+    DiscordSerializer,
 )
 from .permissions import IsAdmin
+from . import secrets
 
+            # serializers are magic. Apparently using foreign key here will automatically
+            # redirect me to discord_users model
 logger = logging.getLogger("accounts")
 
+class CheckDiscordView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        if request.user.discord_id is None:
+            return Response(status=404)
+        else:    
+            serializer = DiscordSerializer(request.user.discord_id)
+            return Response(serializer.data, status=200)
+
+class DiscordLinkingView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        code = request.data.get("code")
+        if not code:
+            return Response({'error' : 'code variable not present', 'code' : code}, status=400)
+        print(code, secrets.DISCORD_CLIENT_ID, secrets.DISCORD_SECRET_ID, secrets.CALLBACK_URL)
+        token_req = requests.post(secrets.DISCORD_TOKEN_URL, data = {
+            "client_id" : secrets.DISCORD_CLIENT_ID,
+            "client_secret" : secrets.DISCORD_SECRET_ID,
+            "grant_type": "authorization_code",
+            "code" : code,
+            "redirect_uri" : secrets.CALLBACK_URL,
+        }) #headers = {"Content-Type" : "application/x-www-form-urlencoded"}
+        token_req.raise_for_status()
+        token_data = token_req.json()
+        if not token_data["access_token"] or not token_data["token_type"]:
+            return Response({'error': 'could not get access token'}, status=400)
+        discord_user_req = requests.get(secrets.DISCORD_INFO_URL, headers = {"Authorization" : f'{token_data["token_type"]} {token_data["access_token"]}'})
+        discord_user_req.raise_for_status()
+        discord_user_data = discord_user_req.json()
+        discord_user_data_ser = DiscordSerializer(data = discord_user_data)
+        if discord_user_data_ser.is_valid():
+            discord_user_data_ser = discord_user_data_ser.save()
+        else:
+            return Response(discord_user_data_ser.errors, status=400)
+        
+        user = request.user
+        user.discord_id = discord_user_data_ser
+        # if user.is_valid():
+        try:
+            user.save() 
+            request.user.refresh_from_db() 
+            return Response(status=200)
+        except:
+            return Response({'error': "couldn't link user"}, status=400)
+        # else:
+        #     return Response(user.error, status=400)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
