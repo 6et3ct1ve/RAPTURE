@@ -22,7 +22,7 @@ class AuthLoggingMiddleware(MiddlewareMixin):
     
     def process_response(self, request, response):
         if request.path == "/api/accounts/login/" and request.method == "POST":
-            username = self._get_username(request)
+            username = self._decode_username(request)
             if response.status_code == 200:
                 username = self._decode_username(request)
                 logger.info(f"Login successful: {username}")
