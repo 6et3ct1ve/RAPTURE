@@ -122,6 +122,7 @@ class LikeView(APIView):
                 {"error": "Review not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+            
         like, created = Like.objects.get_or_create(user=request.user, review=review)
 
         if not created:
