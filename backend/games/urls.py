@@ -11,4 +11,5 @@ urlpatterns = [
         views.SteamBulkImportView.as_view(),
         name="steam-bulk-import",
     ),
+    path("ai-recommend/", views.AIRecommendView.as_view(), name="ai-recommend"),
 ]

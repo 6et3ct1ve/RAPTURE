@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from django.conf import settings
 import requests
 import time
+from google import genai
 from .models import Game
 from .permissions import IsAdmin
 from .serializers import (
@@ -237,3 +238,62 @@ class SteamBulkImportView(APIView):
         return Response(
             {"imported": imported, "skipped": skipped, "total": imported + skipped}
         )
+
+
+class AIRecommendView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        prompt = request.data.get("prompt", "").strip()
+
+        if not prompt or len(prompt) < 3:
+            return Response(
+                {"error": "Prompt too short"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if len(prompt) > 500:
+            return Response(
+                {"error": "Prompt too long"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            client = genai.Client(api_key=settings.AI_API_KEY)
+
+            system_instruction = "You are a gaming recommendation assistant. Only provide game recommendations. If the user asks about anything other than video games, politely decline and ask them to request game recommendations instead."
+
+            models_to_try = ["gemini-2.0-flash", "gemini-flash-latest"]
+
+            for model in models_to_try:
+                try:
+                    response = client.models.generate_content(
+                        model=model,
+                        contents=f"{system_instruction}\n\nUser request: {prompt}\n\nProvide 5 game recommendations with brief descriptions.",
+                    )
+
+                    if response.text:
+                        return Response({"recommendations": response.text})
+                except Exception as model_error:
+                    if "503" not in str(model_error) and "UNAVAILABLE" not in str(
+                        model_error
+                    ):
+                        raise
+                    continue
+
+            return Response(
+                {
+                    "error": "AI service temporarily unavailable. Please try again in a moment."
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        except Exception as e:
+            error_msg = str(e)
+            if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                return Response(
+                    {"error": "Rate limit exceeded. Please wait a moment."},
+                    status=status.HTTP_429_TOO_MANY_REQUESTS,
+                )
+            return Response(
+                {"error": "AI service error. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

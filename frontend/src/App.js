@@ -13,6 +13,7 @@ import ReviewDetail from './pages/ReviewDetail/ReviewDetail';
 import Profile from './pages/Profile/Profile';
 import NotFound from './pages/NotFound/NotFound';
 import AdminImport from './pages/AdminImport/AdminImport';
+import AIRecommend from './pages/AIRecommend/AIRecommend';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/admin/import-games" element={<AdminImport />} />
+            <Route path="/ai-recommend" element={<AIRecommend />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

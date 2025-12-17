@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'accounts.User'
 
 STEAM_API_KEY = os.getenv('STEAM_API_KEY')
+AI_API_KEY = os.getenv('AI_API_KEY')
 
 DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
 DISCORD_SECRET_ID = os.getenv('DISCORD_SECRET_ID')

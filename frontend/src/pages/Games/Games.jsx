@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import GameCard from '../../components/game/GameCard';
 import './Games.css';
@@ -49,13 +50,18 @@ function Games() {
     <div>
       <div className="page-header">
         <h1>// GAMES</h1>
-        <input
-          type="text"
-          placeholder="Search games..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="search-input"
-        />
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <input
+            type="text"
+            placeholder="Search games..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="search-input"
+          />
+          <Link to="/ai-recommend" className="btn-primary">
+            AI RECOMMENDATIONS
+          </Link>
+        </div>
       </div>
 
       <div className="games-grid">

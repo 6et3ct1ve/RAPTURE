@@ -1,0 +1,66 @@
+.ai-recommend {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ai-header {
+  margin-bottom: 2rem;
+}
+
+.ai-header h1 {
+  margin-bottom: 0.5rem;
+}
+
+.ai-header p {
+  color: var(--text-secondary);
+}
+
+.ai-form {
+  margin-bottom: 2rem;
+}
+
+.ai-form textarea {
+  width: 100%;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.ai-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.ai-form button {
+  width: 100%;
+  max-width: 400px;
+}
+
+.ai-results {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.recommendations-content {
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.recommendations-content p {
+  margin-bottom: 0.5rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
