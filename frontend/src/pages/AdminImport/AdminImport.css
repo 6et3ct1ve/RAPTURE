@@ -1,0 +1,93 @@
+.admin-import {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.admin-import h1 {
+  margin-bottom: 30px;
+}
+
+.import-section {
+  margin-bottom: 40px;
+}
+
+.import-section h2 {
+  margin-bottom: 15px;
+}
+
+.bulk-btn {
+  width: 100%;
+  max-width: 400px;
+  padding: 15px;
+  font-size: 1rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 10px;
+}
+
+.search-form .search-input {
+  flex: 1;
+}
+
+.search-results {
+  margin-top: 30px;
+}
+
+.search-results h3 {
+  margin-bottom: 15px;
+  color: var(--accent);
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.game-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.game-name {
+  font-weight: bold;
+}
+
+.game-appid {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.import-btn {
+  padding: 8px 20px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .search-form {
+    flex-direction: column;
+  }
+
+  .result-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .import-btn {
+    width: 100%;
+  }
+}

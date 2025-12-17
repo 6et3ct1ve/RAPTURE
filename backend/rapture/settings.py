@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +33,16 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'accounts.User'
+
+STEAM_API_KEY = os.getenv('STEAM_API_KEY')
+
+DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
+DISCORD_SECRET_ID = os.getenv('DISCORD_SECRET_ID')
+DISCORD_CALLBACK_URL = os.getenv('DISCORD_CALLBACK_URL')
+DISCORD_TOKEN_URL = os.getenv('DISCORD_TOKEN_URL')
+DISCORD_INFO_URL = os.getenv('DISCORD_INFO_URL')
+DISCORD_OAUTH2_URL = os.getenv('DISCORD_OAUTH2_URL')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 # Application definition
 
@@ -141,7 +154,7 @@ CORS_ALLOWED_ORIGINS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 20,
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],

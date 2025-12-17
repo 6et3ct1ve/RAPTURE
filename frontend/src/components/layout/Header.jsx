@@ -9,10 +9,12 @@ function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) {
       fetchNotifications();
+      fetchUserRole();
       const interval = setInterval(fetchNotifications, 30000);
       return () => clearInterval(interval);
     }
@@ -23,6 +25,15 @@ function Header() {
       const { data } = await api.get('/notifications/');
       setNotifications(data.results || []);
       setUnreadCount(data.unread_count || 0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchUserRole = async () => {
+    try {
+      const { data } = await api.get('/accounts/profile/');
+      setIsAdmin(data.role === 'admin');
     } catch (err) {
       console.error(err);
     }
@@ -52,15 +63,15 @@ function Header() {
     }
   };
 
-const handleMarkAllRead = async (e) => {
-  e.stopPropagation();
-  try {
-    await api.post('/notifications/mark-all-read/');
-    fetchNotifications();
-  } catch (err) {
-    console.error(err);
-  }
-};
+  const handleMarkAllRead = async (e) => {
+    e.stopPropagation();
+    try {
+      await api.post('/notifications/mark-all-read/');
+      fetchNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <header className="header">
@@ -124,6 +135,7 @@ const handleMarkAllRead = async (e) => {
                 )}
               </div>
               
+              {isAdmin && <Link to="/admin/import-games">IMPORT GAMES</Link>}
               <Link to="/profile">PROFILE</Link>
               <button onClick={handleLogout} className="logout-btn">LOGOUT</button>
             </>

@@ -6,7 +6,7 @@ import { useToast } from '../../components/Toast/ToastContext';
 import Spinner from '../../components/Spinner/Spinner';
 import './Profile.css';
 
-const DISCORD_OAUTH2_URL = "https://discord.com/oauth2/authorize?client_id=1449565322137829477&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fprofile%2F&scope=identify";
+const DISCORD_OAUTH2_URL = `https://discord.com/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.REACT_APP_DISCORD_CALLBACK_URL)}&scope=identify`;
 
 function Profile() {
   const { id } = useParams();
@@ -46,7 +46,7 @@ function Profile() {
           setIsOwnProfile(true);
           
           if (code && !callbackHandled.current) {
-            callbackHandled.current = true; // Mark as handled immediately
+            callbackHandled.current = true;
             
             console.log('Discord code detected and being handled:', code);
             window.history.replaceState({}, '', '/profile');

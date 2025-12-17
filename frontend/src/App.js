@@ -12,6 +12,7 @@ import GameDetail from './pages/GameDetail/GameDetail';
 import ReviewDetail from './pages/ReviewDetail/ReviewDetail';
 import Profile from './pages/Profile/Profile';
 import NotFound from './pages/NotFound/NotFound';
+import AdminImport from './pages/AdminImport/AdminImport';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/reviews/:id" element={<ReviewDetail />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/admin/import-games" element={<AdminImport />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
