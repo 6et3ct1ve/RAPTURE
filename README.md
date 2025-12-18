@@ -3,18 +3,19 @@ Reviews And Player Thoughts Unified Rating Engine
 
 ## Description
 Community gaming review platform with rating system and Steam integration.  
-Features include user reviews, likes, comments, real-time notifications, Discord integration, and automated game import from Steam API.  
-Built with REST API, JWT auth, role-based access control, and SQLite.
+Features include user reviews, likes, comments, real-time notifications, Discord integration, AI-powered recommendations, and automated game import from Steam API.  
+Built with REST API, JWT auth, email verification, role-based access control, and SQLite.
 
 ## Features
 - 5-criteria game rating system
-- User reviews
-- Like/comment functionality
+- User reviews with likes and comments
+- Email verification system (registration + password reset)
 - Internal notification system
-- Discord integration
-- Steam API integration
+- Discord OAuth2 integration + bot notifications
+- Steam API integration for game import
+- AI game recommendations (Google Gemini)
 - User statistics
-- JWT authentication
+- JWT authentication with refresh tokens
 - Role-based access control
 
 ## Technologies
@@ -24,7 +25,10 @@ Built with REST API, JWT auth, role-based access control, and SQLite.
 - JWT authentication
 - SQLite database
 - Steam Web API
-- Discord OAuth2
+- Discord OAuth2 + Bot API
+- Google Gemini AI
+- Gmail SMTP**
+- APScheduler (background tasks)
 
 ### Frontend
 - React
@@ -38,6 +42,8 @@ Built with REST API, JWT auth, role-based access control, and SQLite.
 - Node.js 16+
 - Discord Application (for OAuth)
 - Steam API Key
+- Google Gemini API Key
+- Gmail account with App Password
 
 ### 1. Discord Application Setup
 1. Go to https://discord.com/developers/applications
@@ -52,11 +58,22 @@ Built with REST API, JWT auth, role-based access control, and SQLite.
 2. Register for API key
 3. Copy your key
 
-### 3. Backend Setup
+### 3. **Google Gemini API Key**
+1. Go to https://aistudio.google.com/app/apikey
+2. Create API key
+3. Copy your key
 
-**Create `.env` file in `backend/` directory from .env_example**
+### 4. **Gmail SMTP Setup**
+1. Enable 2-Step Verification at https://myaccount.google.com/security
+2. Generate App Password at https://myaccount.google.com/apppasswords
+3. Copy 16-character password
+
+### 5. Backend Setup
+
+**Create `.env` file in `backend/` directory:**
 
 **Install dependencies and run:**
+
 ```bash
 cd backend
 python -m venv .venv
@@ -68,27 +85,29 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-### 4. Frontend Setup
+### 6. Frontend Setup
 
-**Create `.env` file in `frontend/` directory from .env_example**
+**Create `.env` file in `frontend/` directory:**
 
 **Install dependencies and run:**
+
 ```bash
 cd frontend
 npm install
 npm start
 ```
 
-### 5. Access Application
+### 7. Access Application
 - Frontend: http://localhost:3000
 - Admin Panel: http://localhost:8000/admin/
 
 ## Project Structure
+
 ```
 RAPTURE/
 ├── backend/
-│   ├── accounts/          # User auth, Discord integration
-│   ├── games/             # Game models, Steam API integration
+│   ├── accounts/          # User auth, Discord, email verification
+│   ├── games/             # Game models, Steam API, AI recommendations
 │   ├── reviews/           # Review system, likes, comments
 │   ├── notifications/     # Notification system
 │   └── rapture/           # Django settings
@@ -101,9 +120,14 @@ RAPTURE/
 ```
 
 ## API Endpoints
+
 ### Authentication
 - `POST /api/accounts/register/` - User registration
-- `POST /api/accounts/token/` - Login (get JWT)
+- `GET /api/accounts/verify-email/<uidb64>/<token>/` - Verify email
+- `POST /api/accounts/resend-verification/` - Resend verification
+- `POST /api/accounts/login/` - Login (get JWT)
+- `POST /api/accounts/password-reset/` - Request password reset
+- `POST /api/accounts/password-reset-confirm/<uidb64>/<token>/` - Confirm reset
 - `GET /api/accounts/profile/` - Get current user profile
 
 ### Games
@@ -113,6 +137,7 @@ RAPTURE/
 - `GET /api/games/steam/search/?q=query` - Search Steam games (admin)
 - `POST /api/games/steam/import/` - Import game from Steam (admin)
 - `POST /api/games/steam/bulk-import/` - Bulk import popular games (admin)
+- `POST /api/games/ai-recommend/` - AI game recommendations
 
 ### Reviews
 - `GET /api/reviews/` - List all reviews
