@@ -14,6 +14,9 @@ import Profile from './pages/Profile/Profile';
 import NotFound from './pages/NotFound/NotFound';
 import AdminImport from './pages/AdminImport/AdminImport';
 import AIRecommend from './pages/AIRecommend/AIRecommend';
+import VerifyEmail from './pages/Auth/VerifyEmail';
+import PasswordReset from './pages/Auth/PasswordReset';
+import PasswordResetConfirm from './pages/Auth/PasswordResetConfirm';
 
 function App() {
   return (
@@ -26,6 +29,9 @@ function App() {
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verify-email/:uidb64/:token" element={<VerifyEmail />} />
+            <Route path="/password-reset" element={<PasswordReset />} />
+            <Route path="/reset-password/:uidb64/:token" element={<PasswordResetConfirm />} />
             <Route path="/games/:id" element={<GameDetail />} />
             <Route path="/reviews/:id" element={<ReviewDetail />} />
             <Route path="/profile" element={<Profile />} />

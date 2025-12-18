@@ -21,6 +21,13 @@
   font-size: 1.5rem;
 }
 
+.auth-box h2 {
+  color: var(--accent);
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
 .auth-box form {
   display: flex;
   flex-direction: column;
@@ -41,4 +48,20 @@
   margin-top: 20px;
   text-align: center;
   color: var(--text-secondary);
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-secondary);
+}
+
+.auth-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
 }

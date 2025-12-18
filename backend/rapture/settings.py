@@ -34,8 +34,19 @@ ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'accounts.User'
 
+FRONTEND_URL = "http://localhost:3000"
+
 STEAM_API_KEY = os.getenv('STEAM_API_KEY')
 AI_API_KEY = os.getenv('AI_API_KEY')
+RESEND_API_KEY = os.getenv('RESEND_API_KEY')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 
 DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
 DISCORD_SECRET_ID = os.getenv('DISCORD_SECRET_ID')
@@ -44,6 +55,9 @@ DISCORD_TOKEN_URL = os.getenv('DISCORD_TOKEN_URL')
 DISCORD_INFO_URL = os.getenv('DISCORD_INFO_URL')
 DISCORD_OAUTH2_URL = os.getenv('DISCORD_OAUTH2_URL')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+
+PASSWORD_RESET_TIMEOUT = 180
+EMAIL_VERIFICATION_TIMEOUT = 60
 
 # Application definition
 
@@ -56,7 +70,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
-    "accounts",
+    "accounts.apps.AccountsConfig",
     "games",
     "notifications",
     "reviews.apps.ReviewsConfig",

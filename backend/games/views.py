@@ -261,7 +261,7 @@ class AIRecommendView(APIView):
 
             system_instruction = "You are a gaming recommendation assistant. Only provide game recommendations. If the user asks about anything other than video games, politely decline and ask them to request game recommendations instead."
 
-            models_to_try = ["gemini-2.0-flash", "gemini-flash-latest"]
+            models_to_try = ["gemini-2.5-flash"]
 
             for model in models_to_try:
                 try:

@@ -19,7 +19,7 @@ function Login() {
       localStorage.setItem('refresh_token', data.refresh);
       showToast('Login successful', 'success');
       const redirect = searchParams.get('redirect') || '/';
-      navigate(redirect);
+      window.location.href = redirect;
     } catch (err) {
       showToast('Invalid credentials', 'error');
     }
@@ -46,7 +46,12 @@ function Login() {
           />
           <button type="submit" className="btn-primary">LOGIN</button>
         </form>
-        <p>No account? <Link to={`/register${window.location.search}`}>Register here</Link></p>
+        <p className="auth-link">
+          <Link to="/password-reset">Forgot password?</Link>
+        </p>
+        <p className="auth-link">
+          No account? <Link to={`/register${window.location.search}`}>Register here</Link>
+        </p>
       </div>
     </div>
   );

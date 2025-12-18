@@ -1,11 +1,14 @@
 from rest_framework import serializers
 from .models import User, Discord_User
 from reviews.models import Like
+from django.db.models import Avg, F
+
 
 class DiscordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discord_User
-        fields = ['id', 'username', 'global_name']
+        fields = ["id", "username", "global_name"]
+
 
 class UserListSerializer(serializers.ModelSerializer):
     reviews_count = serializers.SerializerMethodField()
@@ -18,6 +21,7 @@ class UserListSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
+            "email_verified",
             "role",
             "unique_id",
             "created_at",
@@ -31,7 +35,6 @@ class UserListSerializer(serializers.ModelSerializer):
         return obj.reviews.count()
 
     def get_average_rating_given(self, obj):
-        from django.db.models import Avg, F
 
         avg = obj.reviews.aggregate(
             avg_rating=Avg(
