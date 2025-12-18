@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useToast } from '../../components/Toast/ToastContext';
@@ -8,10 +8,23 @@ import './AdminImport.css';
 function AdminImport() {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [isAdmin, setIsAdmin] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const response = await api.get('/accounts/profile/');
+        setIsAdmin(response.data.role === 'admin');
+      } catch {
+        setIsAdmin(false);
+      }
+    };
+    checkAdmin();
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -68,6 +81,9 @@ function AdminImport() {
       setIsImporting(false);
     }
   };
+
+  if (isAdmin === null) return <div>Loading...</div>;
+  if (!isAdmin) return <div className="admin-import-container"><h2>Access Denied</h2></div>;
 
   return (
     <div className="admin-import">
